@@ -24,7 +24,7 @@ export default function Contact() {
             Contact us
           </h2>
           <p className="mt-4 text-lg leading-8 text-gray-600">
-            We're here to answer all your questions and help you create your perfect wedding website.
+            We&apos;re here to answer all your questions and help you create your perfect wedding website.
           </p>
         </div>
 
