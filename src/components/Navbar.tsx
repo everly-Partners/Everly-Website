@@ -88,10 +88,6 @@ export default function Navbar() {
           
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center space-x-8">
-          <a href="#home" onClick={(e) => scrollToSection(e, 'home')} 
-              className={getLinkClasses('home')}>
-              Home
-            </a>
             <a href="#about" onClick={(e) => scrollToSection(e, 'about')} 
               className={getLinkClasses('about')}>
               About
