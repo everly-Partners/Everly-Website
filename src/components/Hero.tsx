@@ -1,26 +1,16 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
-import Image from 'next/image';
+import { useEffect, useRef } from 'react';
 
 export default function Hero() {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [showSplash, setShowSplash] = useState(true);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowSplash(false);
-    }, 1500);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  useEffect(() => {
-    if (videoRef.current && !showSplash) {
+    if (videoRef.current) {
       videoRef.current.play().catch(error => {
         console.log("Video autoplay failed:", error);
       });
     }
-  }, [showSplash]);
+  }, []);
 
   const scrollToSection = (e: React.MouseEvent<HTMLAnchorElement>, sectionId: string) => {
     e.preventDefault();
@@ -29,23 +19,6 @@ export default function Hero() {
       element.scrollIntoView({ behavior: 'smooth' });
     }
   };
-
-  if (showSplash) {
-    return (
-      <div className="fixed inset-0 bg-gradient-to-b from-white to-pink-50 flex items-center justify-center z-50">
-        <div className="animate-logo max-w-[90vw]">
-          <Image
-            src="/everly.png"
-            alt="Everly Logo"
-            width={800}
-            height={800}
-            priority
-            className="drop-shadow-2xl"
-          />
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden">

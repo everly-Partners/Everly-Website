@@ -1,10 +1,11 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('home');
   const [isScrolled, setIsScrolled] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -22,21 +23,59 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      // Vérifier si le clic est sur le bouton du menu ou dans le menu lui-même
+      const mobileMenu = document.querySelector('.mobile-menu');
+      const isClickInMenu = mobileMenu?.contains(event.target as Node);
+      const isClickInMenuRef = menuRef.current?.contains(event.target as Node);
+
+      if (!isClickInMenu && !isClickInMenuRef) {
+        setIsMenuOpen(false);
+      }
+    };
+
+    if (isMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isMenuOpen]);
+
+  useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
+          console.log('Section:', entry.target.id, 'Ratio:', entry.intersectionRatio, 'isIntersecting:', entry.isIntersecting);
+          
+          // Vérification plus permissive pour toutes les sections
           if (entry.isIntersecting && window.scrollY >= 100) {
-            setActiveSection(entry.target.id);
+            const currentSection = entry.target.id;
+            console.log('Setting active section to:', currentSection);
+            
+            // Forcer la mise à jour pour toutes les sections
+            requestAnimationFrame(() => {
+              setActiveSection(currentSection);
+              console.log('Active section set to:', currentSection);
+            });
           }
         });
       },
-      { threshold: 0.5 }
+      { 
+        threshold: [0, 0.1, 0.2, 0.3, 0.4, 0.5],  // Plus de points de détection
+        rootMargin: '-10% 0px -10% 0px'  // Marge légèrement plus grande
+      }
     );
 
+    // Vérifier si les sections existent
     const sections = ['about', 'templates', 'pricing', 'contact'];
     sections.forEach((section) => {
       const element = document.getElementById(section);
-      if (element) observer.observe(element);
+      console.log(`Section ${section}:`, element ? 'Found' : 'Not found');
+      if (element) {
+        observer.observe(element);
+      }
     });
 
     return () => observer.disconnect();
@@ -48,20 +87,20 @@ export default function Navbar() {
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
     }
-    setIsMenuOpen(false);
+        setIsMenuOpen(false);
   };
 
   const getLinkClasses = (sectionId: string, isMobile: boolean = false) => {
     const baseClasses = isMobile
-      ? "block px-3 py-2 transition-colors"
+      ? "block px-3 py-2 transition-colors text-gray-600 hover:text-pink-600"
       : "transition-colors";
     
     const activeClasses = isMobile
-      ? "text-pink-600 font-medium"
+      ? ""  // Plus de style spécial sur mobile pour la section active
       : "text-pink-600";
     
     const inactiveClasses = isMobile
-      ? "text-gray-600 hover:text-pink-600"
+      ? ""  // Plus de style spécial sur mobile pour les sections inactives
       : isScrolled 
         ? "text-gray-600 hover:text-pink-600"
         : "text-white hover:text-pink-300";
@@ -74,7 +113,7 @@ export default function Navbar() {
       isScrolled ? 'bg-white/80 backdrop-blur-md shadow-sm' : 'bg-transparent'
     }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
+        <div className="flex justify-between h-16" ref={menuRef}>
           <div className="flex items-center">
             <a href="#" onClick={(e) => scrollToSection(e, 'hero')} 
               className={`text-2xl font-bold transition-colors ${
@@ -132,8 +171,12 @@ export default function Navbar() {
 
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="md:hidden">
+        <div className="md:hidden mobile-menu">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white">
+            <a href="#hero" onClick={(e) => scrollToSection(e, 'hero')}
+              className={getLinkClasses('home', true)}>
+              Home
+            </a>
             <a href="#about" onClick={(e) => scrollToSection(e, 'about')}
               className={getLinkClasses('about', true)}>
               About
@@ -147,7 +190,7 @@ export default function Navbar() {
               Pricing
             </a>
             <a href="#contact" onClick={(e) => scrollToSection(e, 'contact')}
-              className={getLinkClasses('contact', true)}>
+              className={`${getLinkClasses('contact', true)} block w-full text-left`}>
               Contact
             </a>
           </div>

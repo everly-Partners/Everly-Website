@@ -49,14 +49,15 @@ export default function About() {
           </div>
           
           <div className="mt-12 sm:mt-16 lg:mt-0">
-            <div className="relative rounded-lg overflow-hidden">
-              <Image
-                src="/gadrudyyoeli.png"
-                alt="Our team at work"
-                width={800}
-                height={600}
-                className="w-full rounded-xl shadow-xl ring-1 ring-gray-400/10"
-              />
+            <div className="relative w-full max-w-full overflow-hidden rounded-lg">
+              <div className="aspect-[4/3] w-full relative">
+                <Image
+                  src="/gadrudyyoeli.png"
+                  alt="Our team at work"
+                  fill
+                  className="object-cover rounded-xl shadow-xl ring-1 ring-gray-400/10"
+                />
+              </div>
             </div>
           </div>
         </div>
