@@ -3,13 +3,18 @@ import { useState, useEffect } from 'react';
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState('hero');
+  const [activeSection, setActiveSection] = useState('home');
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
       const scrollPosition = window.scrollY;
       setIsScrolled(scrollPosition > 10);
+
+      // Si on est presque en haut de la page, activer home
+      if (scrollPosition < 100) {
+        setActiveSection('home');
+      }
     };
 
     window.addEventListener('scroll', handleScroll);
@@ -20,7 +25,7 @@ export default function Navbar() {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
+          if (entry.isIntersecting && window.scrollY >= 100) {
             setActiveSection(entry.target.id);
           }
         });
@@ -28,7 +33,7 @@ export default function Navbar() {
       { threshold: 0.5 }
     );
 
-    const sections = ['hero', 'about', 'templates', 'pricing', 'contact'];
+    const sections = ['about', 'templates', 'pricing', 'contact'];
     sections.forEach((section) => {
       const element = document.getElementById(section);
       if (element) observer.observe(element);
@@ -83,6 +88,10 @@ export default function Navbar() {
           
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center space-x-8">
+          <a href="#home" onClick={(e) => scrollToSection(e, 'home')} 
+              className={getLinkClasses('home')}>
+              Home
+            </a>
             <a href="#about" onClick={(e) => scrollToSection(e, 'about')} 
               className={getLinkClasses('about')}>
               About
